@@ -1,0 +1,10 @@
+services:
+  planner:
+    build: .
+    ports:
+      - "8787:8787"
+    volumes:
+      - ./data:/data
+    environment:
+      DATABASE_PATH: /data/planner.db
+    restart: unless-stopped
