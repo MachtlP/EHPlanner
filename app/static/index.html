@@ -7,44 +7,104 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Planner">
-  <title>Planner</title>
+  <meta name="apple-mobile-web-app-title" content="Machtls-Planner">
+  <title>Machtls-Planner</title>
   <link rel="manifest" href="/static/manifest.webmanifest">
   <link rel="icon" href="/static/icon-192.png">
   <link rel="apple-touch-icon" href="/static/icon-192.png">
-  <link rel="stylesheet" href="/static/styles.css">
+  <link rel="stylesheet" href="/static/styles.css?v=11">
 </head>
 <body>
+  <div class="shell">
+  <nav class="side" aria-label="Sections">
+    <a href="#matrix">Eisenhower Matrix</a>
+    <a href="#streams">Streams</a>
+    <a href="#calendar">Calendar</a>
+    <a href="#builder">Task builder</a>
+    <a href="#time">Time spent</a>
+    <a href="#done">Done</a>
+    <a href="#graveyard">Graveyard</a>
+  </nav>
   <div class="page">
     <header class="top">
       <div>
         <p class="eyebrow">Planner</p>
-        <h1>Eisenhower</h1>
+        <h1 id="app-title">Machtls-Planner</h1>
       </div>
-      <p id="matrix-scope" class="scope">All streams</p>
+      <div class="top-tools">
+        <p id="matrix-scope" class="scope">All streams</p>
+        <button type="button" class="gear" id="open-settings" aria-label="Settings">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+            <path fill="currentColor" fill-rule="evenodd" d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.2 7.2 0 0 0-1.63-.94l-.36-2.54a.5.5 0 0 0-.5-.42h-3.84a.5.5 0 0 0-.5.42l-.36 2.54c-.59.24-1.14.56-1.63.94l-2.39-.96a.5.5 0 0 0-.6.22L2.71 8.84a.5.5 0 0 0 .12.64l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58a.5.5 0 0 0-.12.64l1.92 3.32c.14.23.4.32.6.22l2.39-.96c.49.38 1.04.7 1.63.94l.36 2.54c.05.24.26.42.5.42h3.84c.24 0 .45-.18.5-.42l.36-2.54c.59-.24 1.14-.56 1.63-.94l2.39.96c.22.1.47.01.6-.22l1.92-3.32a.5.5 0 0 0-.12-.64l-2.03-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z"></path>
+          </svg>
+        </button>
+      </div>
     </header>
 
     <div id="filters" class="filters" aria-label="Filter the matrix"></div>
 
     <section class="matrix" id="matrix" aria-label="Eisenhower matrix"></section>
 
-    <div class="below">
-      <section class="panel" aria-label="Streams">
-        <div class="panel-head">
-          <h2>Streams</h2>
-          <button type="button" class="btn" id="add-stream">Add stream</button>
-        </div>
+    <section class="panel streams-panel" id="streams" aria-label="Streams">
+      <div class="panel-head">
+        <h2>Streams</h2>
+        <button type="button" class="btn" id="add-stream">Add stream</button>
+      </div>
+      <div class="streams-layout">
+        <div id="stream-pie" class="chart-card" aria-label="Open tasks by quadrant"></div>
         <div id="stream-list" class="stream-list"></div>
-      </section>
+      </div>
+    </section>
 
-      <section class="panel" aria-label="Done">
+    <section class="week" id="calendar" aria-label="Week">
+      <div class="panel-head week-head">
+        <h2 id="week-title">Week</h2>
+        <button type="button" class="btn ghost" id="week-prev">Previous</button>
+        <button type="button" class="btn ghost" id="week-today">This week</button>
+        <button type="button" class="btn ghost" id="week-next">Next</button>
+        <button type="button" class="btn" id="fill-week">Fill week</button>
+        <button type="button" class="btn ghost" id="refresh-cal">Refresh</button>
+      </div>
+      <p id="week-status" class="muted week-status"></p>
+      <div id="week-legend" class="legend"></div>
+      <div id="week-grid" class="week-grid"></div>
+      <section class="builder" id="builder" data-drop-unscheduled aria-label="Task builder">
         <div class="panel-head">
-          <h2>Done <span id="done-count" class="count-inline">0</span></h2>
-          <button type="button" class="btn ghost" id="done-toggle">Show</button>
+          <h2>Task builder</h2>
         </div>
-        <div id="done-list" class="done-list"></div>
+        <p class="muted">Open tasks with no day yet. Drag one onto the week, or fill the week from Do through Later.</p>
+        <div id="builder-list" class="builder-list"></div>
       </section>
-    </div>
+    </section>
+
+    <section class="panel time-panel" id="time" aria-label="Time spent">
+      <div class="panel-head week-head">
+        <h2>Time spent <span id="time-range" class="count-inline"></span></h2>
+        <button type="button" class="btn ghost" id="time-prev">Previous</button>
+        <button type="button" class="btn ghost" id="time-today">This week</button>
+        <button type="button" class="btn ghost" id="time-next">Next</button>
+      </div>
+      <p class="muted week-status">What the day actually went to. This follows the same week as the calendar.</p>
+      <div id="time-grid" class="time-grid"></div>
+    </section>
+
+    <section class="panel done-panel" id="done" aria-label="Done">
+      <div class="panel-head">
+        <h2>Done <span id="done-count" class="count-inline">0</span></h2>
+        <button type="button" class="btn ghost" id="done-toggle">Show</button>
+      </div>
+      <div id="done-charts" class="done-charts"></div>
+      <div id="done-list" class="done-list"></div>
+    </section>
+
+    <section class="panel graveyard-panel" id="graveyard" aria-label="Graveyard">
+      <div class="panel-head">
+        <h2>Graveyard</h2>
+      </div>
+      <p class="muted week-status">Streams parked here stay out of the matrix and the week. Restore one, or delete it permanently.</p>
+      <div id="graveyard-list" class="graveyard-list"></div>
+    </section>
+  </div>
   </div>
 
   <dialog id="task-dialog">
@@ -58,6 +118,9 @@
       </label>
       <label>Stream
         <select name="stream_id" required></select>
+      </label>
+      <label>Day
+        <input name="scheduled_on" type="date">
       </label>
       <div class="switches">
         <label class="switch"><input type="checkbox" name="important"> Important</label>
@@ -82,7 +145,6 @@
       </label>
       <p id="stream-error" class="form-error" hidden></p>
       <footer class="dialog-actions">
-        <button type="button" class="btn danger" id="stream-delete" hidden>Delete</button>
         <span class="spacer"></span>
         <button type="button" class="btn ghost" id="stream-cancel">Cancel</button>
         <button type="submit" class="btn primary">Save</button>
@@ -90,8 +152,123 @@
     </form>
   </dialog>
 
+  <dialog id="delete-stream-dialog">
+    <form id="delete-stream-form">
+      <h3 id="delete-stream-title">Delete stream</h3>
+      <p id="delete-stream-copy" class="muted"></p>
+      <p class="muted">Move to graveyard keeps the stream and its tasks. Delete permanently removes them.</p>
+      <p id="delete-stream-error" class="form-error" hidden></p>
+      <footer class="dialog-actions">
+        <button type="button" class="btn ghost" id="delete-stream-cancel">Cancel</button>
+        <span class="spacer"></span>
+        <button type="button" class="btn" id="graveyard-stream">Move to graveyard</button>
+        <button type="button" class="btn purge" id="purge-stream">Delete permanently</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <dialog id="time-dialog">
+    <form id="time-form">
+      <h3 id="time-dialog-title">Log time</h3>
+      <label>What
+        <input name="note" required maxlength="200" autocomplete="off">
+      </label>
+      <div class="time-range-fields">
+        <label>Start
+          <input name="start" type="time" required>
+        </label>
+        <label>End
+          <input name="end" type="time" required>
+        </label>
+      </div>
+      <label>Stream
+        <select name="stream_id"></select>
+      </label>
+      <label>Day
+        <input name="day" type="date" required>
+      </label>
+      <p id="time-error" class="form-error" hidden></p>
+      <footer class="dialog-actions">
+        <button type="button" class="btn danger" id="time-delete" hidden>Delete</button>
+        <span class="spacer"></span>
+        <button type="button" class="btn ghost" id="time-cancel">Cancel</button>
+        <button type="submit" class="btn primary">Save</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <dialog id="plan-dialog">
+    <form id="plan-form">
+      <h3 id="plan-title">Plan the day</h3>
+      <p id="plan-task-name"></p>
+      <label>Day
+        <input name="day" type="date" required>
+      </label>
+      <div class="plan-modes">
+        <label class="switch"><input type="radio" name="mode" value="clock" checked> On the clock</label>
+        <label class="switch"><input type="radio" name="mode" value="estimate"> Estimate</label>
+      </div>
+      <div class="time-range-fields" id="plan-clock">
+        <label>Start
+          <input name="start" type="time">
+        </label>
+        <label>End
+          <input name="end" type="time">
+        </label>
+      </div>
+      <label id="plan-estimate" hidden>Hours
+        <input name="hours" type="number" min="0.25" max="24" step="0.25">
+      </label>
+      <p id="plan-error" class="form-error" hidden></p>
+      <footer class="dialog-actions">
+        <button type="button" class="btn danger" id="plan-clear" hidden>Clear</button>
+        <span class="spacer"></span>
+        <button type="button" class="btn ghost" id="plan-cancel">Cancel</button>
+        <button type="submit" class="btn primary">Save</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <dialog id="settings-dialog">
+    <h3>Settings</h3>
+    <form id="settings-form">
+      <label>App name
+        <input name="app_name" required maxlength="40" autocomplete="off">
+      </label>
+      <footer class="dialog-actions">
+        <span class="spacer"></span>
+        <button type="submit" class="btn primary">Save name</button>
+      </footer>
+    </form>
+    <section class="settings-calendars" aria-label="Calendars">
+      <h4>Calendars</h4>
+      <p class="muted">iCloud: open the calendar, share it as a public calendar, and paste the webcal link. Outlook: paste the link that ends in calendar.ics. The calendar.html page does not load. The week picks it up after Refresh.</p>
+      <ul id="calendar-settings" class="cal-settings"></ul>
+      <form id="calendar-form">
+        <label>Name
+          <input name="name" required maxlength="80" autocomplete="off">
+        </label>
+        <label>Link
+          <input name="url" required autocomplete="off" placeholder="webcal:// or https://…/calendar.ics">
+        </label>
+        <label>Color
+          <input name="color" type="color" value="#0e61b9">
+        </label>
+        <p id="calendar-error" class="form-error" hidden></p>
+        <footer class="dialog-actions">
+          <span class="spacer"></span>
+          <button type="submit" class="btn">Add calendar</button>
+        </footer>
+      </form>
+    </section>
+    <footer class="dialog-actions">
+      <span class="spacer"></span>
+      <button type="button" class="btn ghost" id="settings-close">Close</button>
+    </footer>
+  </dialog>
+
   <div id="ghost" hidden></div>
   <p id="toast" class="toast" hidden></p>
-  <script src="/static/app.js"></script>
+  <script src="/static/app.js?v=11"></script>
 </body>
 </html>

@@ -1,0 +1,80 @@
+#!/bin/bash
+# Starts the planner if port 8787 is free, then opens it in Brave.
+set -euo pipefail
+
+# install-mac-app.sh replaces this with the folder you cloned.
+PLANNER="__PLANNER_ROOT__"
+URL="http://127.0.0.1:8787"
+LABEL="com.machtl.planner"
+PLIST="${HOME}/Library/LaunchAgents/${LABEL}.plist"
+UVICORN="${PLANNER}/.venv/bin/uvicorn"
+DOMAIN="gui/$(id -u)"
+
+alert() {
+  osascript -e "display alert \"Machtls-Planner\" message \"$1\"" >/dev/null
+}
+
+listening() {
+  lsof -nP -iTCP:8787 -sTCP:LISTEN >/dev/null 2>&1
+}
+
+write_agent() {
+  mkdir -p "${HOME}/Library/LaunchAgents" "${PLANNER}/data"
+  cat > "$PLIST" <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>${LABEL}</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>${UVICORN}</string>
+    <string>app.main:app</string>
+    <string>--host</string>
+    <string>0.0.0.0</string>
+    <string>--port</string>
+    <string>8787</string>
+  </array>
+  <key>WorkingDirectory</key>
+  <string>${PLANNER}</string>
+  <key>StandardOutPath</key>
+  <string>${PLANNER}/data/server.log</string>
+  <key>StandardErrorPath</key>
+  <string>${PLANNER}/data/server.log</string>
+  <key>RunAtLoad</key>
+  <false/>
+  <key>KeepAlive</key>
+  <false/>
+</dict>
+</plist>
+EOF
+}
+
+start_planner() {
+  if [[ ! -x "$UVICORN" ]]; then
+    alert "The planner environment is missing. In Documents/planner run: python3 -m venv .venv && .venv/bin/pip install -r requirements.txt"
+    exit 1
+  fi
+  write_agent
+  launchctl bootout "${DOMAIN}/${LABEL}" >/dev/null 2>&1 || true
+  launchctl bootstrap "$DOMAIN" "$PLIST"
+  launchctl kickstart "${DOMAIN}/${LABEL}"
+  for _ in $(seq 1 40); do
+    if curl -sf -o /dev/null --max-time 1 "$URL"; then
+      return 0
+    fi
+    sleep 0.25
+  done
+  alert "The planner did not start. The log is in Documents/planner/data/server.log."
+  exit 1
+}
+
+if ! listening; then
+  start_planner
+fi
+
+if ! open -a "Brave Browser" "$URL"; then
+  alert "Brave Browser is not installed. The planner is at ${URL}."
+  exit 1
+fi
